@@ -1,0 +1,19 @@
+from qiskit import QuantumCircuit, execute, Aer
+from qiskit.providers.jobstatus import JOB_FINAL_STATES
+
+class QuantumManager:
+    def __init__(self):
+        self.backend = Aer.get_backend('qasm_simulator')
+        self.jobs = {}
+
+    def add_job(self, circuit):
+        job = execute(circuit, self.backend)
+        self.jobs[job.job_id()] = job
+
+    def check_jobs(self):
+        for job_id, job in list(self.jobs.items()):
+            if job.status() in JOB_FINAL_STATES:
+                result = job.result()
+                counts = result.get_counts()
+                print(f"Job {job_id} finished with counts: {counts}")
+                del self.jobs[job_id]
